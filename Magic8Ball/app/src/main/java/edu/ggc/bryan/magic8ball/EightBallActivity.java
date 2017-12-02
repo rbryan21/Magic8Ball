@@ -21,8 +21,6 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     private SensorManager manager;
     private MediaPlayer popPlayer;
     private MediaPlayer backgroundPlayer;
-//    private boolean isDown = false;
-//    private boolean isUp = false;
     private static final String TAG = "EightBall";
     private static final float VERTICAL_TOL = 0.3f;
     private static final float ALPHA = 0.80f; // weighing factor used by the low pass filter
@@ -79,14 +77,12 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         super.onResume();
         manager.registerListener(this, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_UI);
-//        backgroundPlayer.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         manager.unregisterListener(this);
-//        backgroundPlayer.pause();
     }
 
     private boolean isDown(float gravity) {
@@ -109,41 +105,14 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         accel[1] = highPass(event.values[1], accel[1]);
         accel[2] = highPass(event.values[2], accel[2]);
 
-//        Log.i(TAG, "isDown = " + isDown);
-//        Log.i(TAG, "isUp = " + isUp)
-
-//        Log.i(TAG, "gravity[]=" + gravity[0] + ' ' + gravity[1] + ' ' + gravity[2]);
-
         if (readyForNewAnswer && isDown(gravity[2])) {
             Log.i(TAG, "Down, grabbing a new answer.");
-//            if (!isDown) {
-
             // Grab a new random answer
             Answer newRandomAnswer = Answers.getRandomAnswer();
-
-//                backgroundPlayer.setVolume(0.1f, 0.1f);
             popPlayer.start();
-//            tts.speak(newRandomAnswer.getAnswerText(), TextToSpeech.QUEUE_FLUSH, null);
             eightBallText.setText(newRandomAnswer.getAnswerText());
             readyForNewAnswer = false;
-//                backgroundPlayer.setVolume(1.0f, 1.0f);
-//            isDown = true;
-//            isUp = false;
-//            }
-//
-//        } else if (inRange(gravity[2], 9.81f, VERTICAL_TOL)) {
-//            if (!isUp) {
-//                backgroundPlayer.setVolume(0.1f, 0.1f);
-//                Log.i(TAG, "Up");
-//                tts.speak("up", TextToSpeech.QUEUE_FLUSH, null);
-//                backgroundPlayer.setVolume(1.0f, 1.0f);
-//                isUp = true;
-//                isDown = false;
-//            }
-//
-//        } else {
-//            Log.i(TAG, "In between");
-//        }
+            // text to speech newRandomAnswer.getAnswerText()
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
             Log.i(TAG, "Ready for a new answer!");
             readyForNewAnswer = true;
