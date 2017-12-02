@@ -4,4 +4,5 @@
     <string name="credits_author">Created by Robert Bryan and Michael Cawthon</string>
     <string name="itec4550">ITEC 4550 Fall 2017</string>
     <string name="created_date">Created December 2017</string>
+    <string name="eight_ball_default_text">Ask a question and flip your phone over!</string>
 </resources>
