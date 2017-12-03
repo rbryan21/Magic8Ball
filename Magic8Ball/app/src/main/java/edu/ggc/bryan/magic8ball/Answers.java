@@ -32,7 +32,7 @@ public class Answers {
     };
 
     private static int minAnswerIndex = 0;
-    private static int maxAnswerIndex = Answers.answers.length;
+    private static int maxAnswerIndex = Answers.answers.length - 19;
 
     private static Answer currentAnswer;
 
