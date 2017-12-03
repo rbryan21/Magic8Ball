@@ -129,10 +129,12 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
 //        if (isUp)
 
         float z = event.values[2];
+        Log.v("Float Z Value", String.valueOf(z));
         if (z > 9 && z < 10) {
 
             if (sensorCounter == 0)
             {
+                Log.v("Line 134", "");
                 answer.setCurrentAnswer(answer.getRandomAnswer());
                 String message = answer.getCurrentAnswer();
                 eightBallText.setText(message);
@@ -143,7 +145,7 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             {
                 if (sensorCounter1 == 0)
                 {
-
+                    Log.v("Line 147", "");
 //                    pop.start();
 //                    v.vibrate(500);
                     eightBallText.setText("Ask another question");
