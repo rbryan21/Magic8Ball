@@ -8,6 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Answers {
 
+    private static int minAnswerIndex = 0;
+
     private static Answer[] answers = {
             new Answer("My sources say no"),
             new Answer("My sources say yes"),
@@ -31,22 +33,26 @@ public class Answers {
             new Answer("Nah")
     };
 
-    private static int minAnswerIndex = 0;
     private static int maxAnswerIndex = Answers.answers.length;
-
     private static Answer currentAnswer;
 
-    private static void setCurrentAnswer(Answer answer) {
+    public Answers()
+    {
+        currentAnswer = new Answer("");
+    }
+
+
+    public static void setCurrentAnswer(Answer answer) {
         Answers.currentAnswer = answer;
     }
 
-    public static Answer getCurrentAnswer() {
-        return Answers.currentAnswer;
+    public static String getCurrentAnswer() {
+        return Answers.currentAnswer.getAnswerText();
     }
 
     public static Answer getRandomAnswer() {
         Answer randomAnswer = Answers.answers[ThreadLocalRandom.current().nextInt(Answers.minAnswerIndex, Answers.maxAnswerIndex + 1)];
-        Answers.setCurrentAnswer(randomAnswer);
+//        Answers.setCurrentAnswer(randomAnswer);
         return Answers.currentAnswer;
     }
 

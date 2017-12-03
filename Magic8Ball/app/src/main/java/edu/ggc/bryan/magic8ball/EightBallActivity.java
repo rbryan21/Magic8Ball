@@ -18,7 +18,9 @@ import java.util.Locale;
 
 public class EightBallActivity extends AppCompatActivity implements SensorEventListener {
 
+    private Answers answer;
     private SensorManager manager;
+    private Sensor senAccelerometer;
     private MediaPlayer popPlayer;
     private MediaPlayer backgroundPlayer;
     private static final String TAG = "EightBall";
@@ -29,6 +31,8 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     private TextToSpeech tts;
     private TextView eightBallText;
     private boolean readyForNewAnswer = true;
+    int sensorCounter = 1;
+    int sensorCounter1 = 0;
 
     private boolean inRange(float value, float target, float tol) {
         return value >= target - tol && value <= target + tol;
@@ -50,7 +54,11 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         setContentView(R.layout.activity_eight_ball);
 
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        senAccelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        manager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         popPlayer = new MediaPlayer();
+        answer = new Answers();
+
         eightBallText = (TextView) findViewById(R.id.eightBallText);
 
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
@@ -86,16 +94,17 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     }
 
     private boolean isDown(float gravity) {
-        return inRange(gravity, -9.81f, VERTICAL_TOL) ? true: false;
+        return inRange(gravity, -9.81f, VERTICAL_TOL) ? true : false;
     }
 
     private boolean isUp(float gravity) {
-        return inRange(gravity, 9.81f, VERTICAL_TOL) ? true: false;
+        return inRange(gravity, 9.81f, VERTICAL_TOL) ? true : false;
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        Log.i("Magic8Ball", "Sensor changed!");
+
+        Log.i("Magic8Ball", "Sensor changed!");
 
         gravity[0] = lowPass(event.values[0], gravity[0]);
         gravity[1] = lowPass(event.values[1], gravity[1]);
@@ -105,24 +114,59 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         accel[1] = highPass(event.values[1], accel[1]);
         accel[2] = highPass(event.values[2], accel[2]);
 
-        if (readyForNewAnswer && isDown(gravity[2])) {
-            Log.i(TAG, "Down, grabbing a new answer.");
-            // Grab a new random answer
-            Answer newRandomAnswer = Answers.getRandomAnswer();
-            popPlayer.start();
-            eightBallText.setText(newRandomAnswer.getAnswerText());
-            readyForNewAnswer = false;
-            // text to speech newRandomAnswer.getAnswerText()
-        } else if (!readyForNewAnswer && isUp(gravity[2])) {
-            Log.i(TAG, "Ready for a new answer!");
-            readyForNewAnswer = true;
+//        if (readyForNewAnswer && isDown(gravity[2])) {
+//            Log.i(TAG, "Down, grabbing a new answer.");
+//            // Grab a new random answer
+//
+//            popPlayer.start();
+//            answer.setCurrentAnswer(answer.getRandomAnswer());
+//            readyForNewAnswer = false;
+//            // text to speech newRandomAnswer.getAnswerText()
+//        } else if (!readyForNewAnswer && isUp(gravity[2])) {
+//            Log.i(TAG, "Ready for a new answer!");
+//            readyForNewAnswer = true;
+//        }
+//        if (isUp)
+
+        float z = event.values[2];
+        if (z > 9 && z < 10) {
+
+            if (sensorCounter == 0)
+            {
+                answer.setCurrentAnswer(answer.getRandomAnswer());
+                String message = answer.getCurrentAnswer();
+                eightBallText.setText(message);
+//                ts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+                sensorCounter++;
+                sensorCounter1 = 0;
+            } else if (z > -10 && z < -9)
+            {
+                if (sensorCounter1 == 0)
+                {
+
+//                    pop.start();
+//                    v.vibrate(500);
+                    eightBallText.setText("Ask another question");
+                    sensorCounter1++;
+                    sensorCounter = 0;
+                }
+            }
         }
     }
 
+    /**
+     * Called when the accuracy of the registered sensor has changed.  Unlike
+     * onSensorChanged(), this is only called when this accuracy value changes.
+     * <p>
+     * <p>See the SENSOR_STATUS_* constants in
+     * {@link SensorManager SensorManager} for details.
+     *
+     * @param sensor
+     * @param accuracy The new accuracy of this sensor, one of
+     *                 {@code SensorManager.SENSOR_STATUS_*}
+     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
-
-
 }
