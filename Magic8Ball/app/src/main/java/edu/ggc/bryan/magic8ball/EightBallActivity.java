@@ -149,6 +149,12 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             readyForNewAnswer = false;
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
             Log.i(TAG, "Ready for a new answer!");
+            try {
+                Thread.sleep(3000);
+                eightBallText.setText("Ask me another question!");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             readyForNewAnswer = true;
         }
     }
