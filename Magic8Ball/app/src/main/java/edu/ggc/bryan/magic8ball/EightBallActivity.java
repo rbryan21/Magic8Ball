@@ -31,7 +31,7 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     private TextToSpeech tts;
     private TextView eightBallText;
     private boolean readyForNewAnswer = true;
-    private Answer currentAnswer;
+    private String currentAnswerText;
     private String currentAnswerKey = "currentAnswer";
 
     private boolean inRange(float value, float target, float tol) {
@@ -66,7 +66,8 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         eightBallText = (TextView) findViewById(R.id.eightBallText);
 
         if (savedInstanceState != null) {
-            eightBallText.setText(savedInstanceState.getCharSequence(currentAnswerKey));
+            currentAnswerText = savedInstanceState.getCharSequence(currentAnswerKey).toString();
+            eightBallText.setText(currentAnswerText);
         }
 
         backgroundPlayer = MediaPlayer.create(this, R.raw.mists_of_time);
@@ -94,8 +95,8 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     @Override
     protected void onSaveInstanceState (Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (currentAnswer != null)
-            outState.putCharSequence(currentAnswerKey, currentAnswer.getAnswerText());
+        if (currentAnswerText != null)
+            outState.putCharSequence(currentAnswerKey, currentAnswerText);
         else
             outState.putCharSequence(currentAnswerKey, "Ask a question and flip your phone over!");
     }
@@ -142,9 +143,9 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         if (readyForNewAnswer && isDown(gravity[2])) {
             Log.i(TAG, "Down, grabbing a new answer.");
             // Grab a new random answer
-            currentAnswer = Answers.getRandomAnswer();
-            eightBallText.setText(currentAnswer.getAnswerText());
-            tts.speak(currentAnswer.getAnswerText(), TextToSpeech.QUEUE_FLUSH, null);
+            currentAnswerText = Answers.getRandomAnswer().getAnswerText();
+            eightBallText.setText(currentAnswerText);
+            tts.speak(currentAnswerText, TextToSpeech.QUEUE_FLUSH, null);
             readyForNewAnswer = false;
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
             Log.i(TAG, "Ready for a new answer!");
