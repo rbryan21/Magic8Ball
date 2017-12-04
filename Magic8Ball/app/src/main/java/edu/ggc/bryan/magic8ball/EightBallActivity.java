@@ -1,5 +1,6 @@
 package edu.ggc.bryan.magic8ball;
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +31,7 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     private TextToSpeech tts;
     private TextView eightBallText;
     private boolean readyForNewAnswer = true;
+    Vibrator vibrate = null;
 
     private boolean inRange(float value, float target, float tol) {
         return value >= target - tol && value <= target + tol;
@@ -52,6 +55,7 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
         popPlayer = new MediaPlayer();
         eightBallText = (TextView) findViewById(R.id.eightBallText);
+        vibrate = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -111,6 +115,8 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             Answer newRandomAnswer = Answers.getRandomAnswer();
             popPlayer.start();
             eightBallText.setText(newRandomAnswer.getAnswerText());
+            vibrate.vibrate(500);
+            Log.i(TAG, "Phone should have vibrated!");
             readyForNewAnswer = false;
             // text to speech newRandomAnswer.getAnswerText()
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
