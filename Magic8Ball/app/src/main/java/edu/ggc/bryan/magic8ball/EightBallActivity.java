@@ -1,6 +1,5 @@
 package edu.ggc.bryan.magic8ball;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
@@ -9,7 +8,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -71,7 +69,9 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             eightBallText.setText(savedInstanceState.getCharSequence(currentAnswerKey));
         }
 
-//        backgroundPlayer = MediaPlayer.create(this, R.raw.mistsoftime4tmono);
+        backgroundPlayer = MediaPlayer.create(this, R.raw.mists_of_time);
+        backgroundPlayer.setVolume(.75f, .75f);
+
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -105,12 +105,14 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         super.onResume();
         manager.registerListener(this, manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_UI);
+        backgroundPlayer.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         manager.unregisterListener(this);
+        backgroundPlayer.pause();
     }
 
     private boolean isDown(float gravity) {
