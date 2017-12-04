@@ -121,6 +121,7 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             // text to speech newRandomAnswer.getAnswerText()
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
             Log.i(TAG, "Ready for a new answer!");
+            eightBallText.setText("Ask Me Another Question!");
             readyForNewAnswer = true;
         }
     }
