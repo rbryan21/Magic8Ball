@@ -1,6 +1,7 @@
 package edu.ggc.bryan.magic8ball;
 
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Locale;
 
 public class EightBallActivity extends AppCompatActivity implements SensorEventListener {
@@ -29,6 +31,8 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
     private TextToSpeech tts;
     private TextView eightBallText;
     private boolean readyForNewAnswer = true;
+    private Answer currentAnswer;
+    private String currentAnswerKey = "currentAnswer";
 
     private boolean inRange(float value, float target, float tol) {
         return value >= target - tol && value <= target + tol;
@@ -51,8 +55,21 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
 
         manager = (SensorManager) getSystemService(SENSOR_SERVICE);
         popPlayer = new MediaPlayer();
+        try {
+            AssetFileDescriptor afd = getAssets().openFd("pop.ogg");
+            popPlayer.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+            popPlayer.prepare();
+            afd.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         eightBallText = (TextView) findViewById(R.id.eightBallText);
 
+        if (savedInstanceState != null) {
+            eightBallText.setText(savedInstanceState.getCharSequence(currentAnswerKey));
+        }
+
+//        backgroundPlayer = MediaPlayer.create(this, R.raw.mistsoftime4tmono);
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -70,6 +87,15 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (currentAnswer != null)
+            outState.putCharSequence(currentAnswerKey, currentAnswer.getAnswerText());
+        else
+            outState.putCharSequence(currentAnswerKey, "Ask a question and flip your phone over!");
     }
 
     @Override
@@ -105,14 +131,17 @@ public class EightBallActivity extends AppCompatActivity implements SensorEventL
         accel[1] = highPass(event.values[1], accel[1]);
         accel[2] = highPass(event.values[2], accel[2]);
 
+        if (isDown(gravity[2])) {
+            popPlayer.start();
+        }
+
         if (readyForNewAnswer && isDown(gravity[2])) {
             Log.i(TAG, "Down, grabbing a new answer.");
             // Grab a new random answer
-            Answer newRandomAnswer = Answers.getRandomAnswer();
-            popPlayer.start();
-            eightBallText.setText(newRandomAnswer.getAnswerText());
+            currentAnswer = Answers.getRandomAnswer();
+            eightBallText.setText(currentAnswer.getAnswerText());
+            tts.speak(currentAnswer.getAnswerText(), TextToSpeech.QUEUE_FLUSH, null);
             readyForNewAnswer = false;
-            // text to speech newRandomAnswer.getAnswerText()
         } else if (!readyForNewAnswer && isUp(gravity[2])) {
             Log.i(TAG, "Ready for a new answer!");
             readyForNewAnswer = true;
